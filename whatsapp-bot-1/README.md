@@ -1,203 +1,324 @@
-# [Project Name] — WhatsApp Chatbot
+# WhatsApp Service Business Customer Support Bot
 
-> **Client:** [Anonymized — e.g. "Real Estate Client, Raipur"]  
-> **Built by:** Rohit/Devansh  
-> **Mentor:** Kapil & Apratim  
-> **Timeline:** Week X – Week Y  
-> **Status:** 🔵 In Progress / ✅ Delivered
+A complete, market-ready Flask project for a **Service Business Customer Support Bot** using a restaurant ordering demo. It is built for the project requirement: WhatsApp chatbot template + demo bot + database integration + analytics dashboard + deployment guide.
 
----
+The bot can run in three ways:
 
-## Problem Statement
+1. **Browser demo chat** for instant project demonstration without WhatsApp credentials.
+2. **Twilio WhatsApp Sandbox webhook** for fast WhatsApp testing.
+3. **Meta WhatsApp Cloud API webhook** as an optional production-style adapter.
 
-*1–2 sentences: What was the client's problem? What were they doing manually that this bot replaces?*
-
-Example: "Client was handling 50+ daily WhatsApp inquiries manually. Response time was 3–4 hours. Lead data was being lost."
+> Important: This project is a business-specific customer support bot, not a general-purpose AI assistant. It answers restaurant/service questions, manages orders/bookings/leads, and stores business records.
 
 ---
 
-## Solution Overview
+## Features
 
-*What does this bot do? List the core flows.*
+### WhatsApp/customer features
 
-- Greets new users and qualifies them (name, requirement, budget)
-- Captures lead data to a Google Sheet / database
-- Sends confirmation message + follow-up after 24 hrs
-- Escalates to human agent on keyword trigger ("speak to agent")
+- Greeting and help flow
+- Restaurant menu browsing
+- Food order cart flow
+- Delivery / pickup handling
+- Payment method capture
+- Order confirmation and order tracking
+- Table reservation / appointment booking
+- FAQ automation from business data
+- Human staff callback / lead capture
+- Feedback capture
+- Browser demo simulator for viva/demo day
+
+### Admin/business features
+
+- Secure admin login with hashed password
+- Analytics dashboard for revenue, orders, leads, conversations, messages, customers and bookings
+- Conversation viewer with full message history
+- Order status management
+- Booking status management
+- Lead pipeline status management
+- Menu item management
+- FAQ management
+- CSV export for orders, leads and customers
+
+### Engineering features
+
+- Flask application factory structure
+- SQLAlchemy data models
+- SQLite default, PostgreSQL-ready through `DATABASE_URL`
+- Twilio webhook XML/TwiML response
+- Optional Twilio request signature validation
+- Meta Cloud API webhook verification and message sending adapter
+- Seed CSV data for menu and FAQs
+- Tests for core bot flows and webhooks
+- Dockerfile, docker-compose, Procfile, Makefile
+- Deployment and architecture docs
 
 ---
 
-## Architecture
+## Project structure
 
+```text
+whatsapp-service-business-bot/
+├── app/
+│   ├── channels/              # Twilio and Meta channel adapters
+│   ├── routes/                # Public, webhook, admin routes
+│   ├── services/              # Bot engine, menu, FAQ, orders, analytics, seed
+│   ├── static/                # CSS and JS
+│   ├── templates/             # Public and admin HTML
+│   ├── __init__.py            # Flask app factory
+│   ├── extensions.py
+│   └── models.py
+├── data/                      # Menu, FAQ, sample data CSVs
+├── docs/                      # Full guides and project documentation
+├── scripts/                   # CSV import and backup utilities
+├── tests/                     # pytest tests
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── run.py
+└── wsgi.py
 ```
-User (WhatsApp)
-    ↓
-Meta WhatsApp Business API
-    ↓
-Webhook → Flask App (this repo)
-    ↓
-[Business Logic Layer]
-    ↓
-Database (SQLite/PostgreSQL) + [Optional: Google Sheets / CRM]
-```
-
-*(Add a proper diagram in `../docs/architecture/bot-1-architecture.png` and link it here)*
 
 ---
 
-## Tech Stack
+## Quick start: run locally
 
-| Layer | Technology |
-|-------|-----------|
-| Language | Python 3.10+ |
-| Framework | Flask |
-| Database | SQLite (dev) / PostgreSQL (prod) |
-| Hosting | [e.g. Railway / DigitalOcean / VPS] |
-| Webhook Tunnel (dev) | Ngrok |
-| WhatsApp API | Meta Cloud API |
-
----
-
-## Local Setup
-
-### Prerequisites
-- Python 3.10+
-- Ngrok account (free tier works)
-- Meta Developer account with WhatsApp Business API access
-
-### Steps
+### 1. Create virtual environment
 
 ```bash
-# 1. Navigate to this project
-cd whatsapp-bot-1
-
-# 2. Create virtual environment
 python -m venv .venv
-source .venv/bin/activate    # Mac/Linux
-.venv\Scripts\activate       # Windows
+```
 
-# 3. Install dependencies
+Activate it:
+
+```bash
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
+# macOS/Linux
+source .venv/bin/activate
+```
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# 4. Set up environment variables
+### 3. Create environment file
+
+```bash
 cp .env.example .env
-# Fill in actual values in .env (get credentials mentors if required)
+```
 
-# 5. Run the app
-python app.py
+On Windows PowerShell:
 
-# 6. In a new terminal — expose localhost via ngrok
+```powershell
+Copy-Item .env.example .env
+```
+
+Open `.env` and update:
+
+```env
+SECRET_KEY=make-this-long-and-random
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=ChangeMe@12345
+BUSINESS_NAME=Spice Garden Restaurant
+```
+
+### 4. Initialize and seed database
+
+The app auto-creates tables and seed records on first run. You can also run:
+
+```bash
+flask --app run.py init-db
+flask --app run.py seed
+```
+
+### 5. Start server
+
+```bash
+flask --app run.py run --debug
+```
+
+Open:
+
+- Website: `http://127.0.0.1:5000/`
+- Browser demo: `http://127.0.0.1:5000/demo`
+- Admin dashboard: `http://127.0.0.1:5000/admin`
+
+Default admin credentials come from `.env`:
+
+```text
+admin@example.com / ChangeMe@12345
+```
+
+---
+
+## Demo script for presentation
+
+Use the browser demo first:
+
+1. Send `hi`
+2. Send `menu`
+3. Send `order`
+4. Send `PZ01 x2, BR01 x1`
+5. Send `done`
+6. Send `MG Road, Pune`
+7. Send `cash`
+8. Copy the generated order number
+9. Send `status ORD-XXXXXX`
+10. Send `book`
+11. Send `Rohit Kumar`
+12. Send `tomorrow 7pm`
+13. Send `4`
+14. Send `human`
+15. Send `Rohit, corporate lunch for 30 people, rohit@example.com`
+16. Open `/admin` to show records and analytics
+
+---
+
+## Twilio WhatsApp Sandbox setup
+
+1. Create/login to Twilio.
+2. Open WhatsApp Sandbox.
+3. Join sandbox from your WhatsApp using the code shown by Twilio.
+4. Expose local Flask using ngrok:
+
+```bash
 ngrok http 5000
+```
 
-# 7. Copy the ngrok URL and set it as your webhook in Meta Developer Console
-# Webhook URL: https://your-ngrok-url.ngrok.io/webhook
-# Verify Token: (use the value from your .env)
+5. In Twilio Sandbox settings, set **When a message comes in** to:
+
+```text
+https://YOUR-NGROK-DOMAIN.ngrok-free.app/webhook/twilio
+```
+
+6. Keep method as `POST`.
+7. Send `hi` or `menu` from WhatsApp.
+
+For production signature validation:
+
+```env
+PUBLIC_BASE_URL=https://your-real-domain.com
+TWILIO_AUTH_TOKEN=your_token
+VALIDATE_TWILIO_SIGNATURE=true
+```
+
+During local ngrok testing, set `PUBLIC_BASE_URL` to the exact ngrok URL.
+
+---
+
+## Meta WhatsApp Cloud API setup
+
+This is optional. Twilio Sandbox is faster for student demos.
+
+1. Create a Meta app with WhatsApp product.
+2. Configure webhook callback URL:
+
+```text
+https://your-domain.com/webhook/meta
+```
+
+3. Use your `.env` value as verify token:
+
+```env
+META_VERIFY_TOKEN=change-this-verify-token
+```
+
+4. Subscribe to WhatsApp `messages` webhook field.
+5. Configure production credentials:
+
+```env
+META_ACCESS_TOKEN=your_meta_token
+META_PHONE_NUMBER_ID=your_phone_number_id
+META_GRAPH_API_VERSION=v25.0
 ```
 
 ---
 
-## Environment Variables
+## Data management
 
-See `.env.example` for all required variables. Never commit `.env`.
+The bot uses these included seed files:
 
-```
-WHATSAPP_TOKEN=          # Meta API access token
-VERIFY_TOKEN=            # Your custom webhook verify token
-PHONE_NUMBER_ID=         # WhatsApp Business phone number ID
-DATABASE_URL=            # SQLite path or PostgreSQL connection string
-```
+- `data/menu.csv` — menu items, SKUs, category, price, tags
+- `data/faqs.csv` — question, answer, category, keywords
+- `data/service_catalog.csv` — service/appointment catalog
+- `data/sample_orders.csv` — sample external analytics data format
 
----
+To add a new client:
 
-## Project Structure
-
-```
-whatsapp-bot-1/
-│
-├── app.py                  # Flask app entry point + webhook handler
-├── requirements.txt        # Pinned dependencies
-├── .env.example            # Environment variable template
-│
-├── handlers/
-│   ├── message_handler.py  # Routes incoming messages to correct flow
-│   ├── lead_flow.py        # Lead capture conversation logic
-│   └── escalation.py       # Human handoff logic
-│
-├── models/
-│   └── lead.py             # Database model for leads
-│
-├── utils/
-│   ├── whatsapp_api.py     # WhatsApp API wrapper (send message, etc.)
-│   └── db.py               # Database connection helpers
-│
-├── tests/
-│   ├── test_webhook.py     # Webhook verification tests
-│   └── test_flows.py       # Conversation flow unit tests
-│
-└── docs/
-    └── conversation-flow.md  # Decision tree / flow diagram
-```
+1. Replace menu and FAQ CSV data.
+2. Run `flask --app run.py reset-db` for a clean local rebuild.
+3. Or import CSV through `scripts/import_csv.py` from Flask shell.
+4. Update `.env` business settings.
+5. Test browser demo.
+6. Connect Twilio/Meta webhook.
 
 ---
 
-## Deployment
-
-### Staging
-```bash
-# [Document your staging server steps here]
-# e.g. push to Railway, or SSH to VPS
-```
-
-### Production
-```bash
-# [Document production deployment steps here]
-# Include: server, process manager (gunicorn/systemd), reverse proxy (nginx)
-```
-
-**Checklist before going live:**
-- [ ] All tests passing (`pytest`)
-- [ ] `.env` set on server (not committed)
-- [ ] Webhook URL updated in Meta Console to production URL
-- [ ] Database backed up
-- [ ] Client tested on staging and approved
-- [ ] Gunicorn running (not Flask dev server)
-
----
-
-## Testing
+## Run tests
 
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=. --cov-report=term-missing
+pytest -q
 ```
 
----
-
-## Known Issues / Limitations
-
-*(Document honestly — this helps future interns)*
-
-- [ ] Issue 1
-- [ ] Issue 2
+Expected: all tests pass.
 
 ---
 
-## Lessons Learned
+## Docker run
 
-*(Fill this out at project end — it becomes part of your case study)*
+```bash
+cp .env.example .env
+docker compose up --build
+```
 
-- What was harder than expected?
-- What would you do differently?
-- What pattern will you reuse in Bot #2?
+Open `http://localhost:5000`.
 
 ---
 
-## Links
+## Deployment summary
 
-- 📄 Case Study: `../docs/case-studies/bot-1-case-study.md`
-- 🏗️ Architecture Diagram: `../docs/architecture/bot-1-architecture.png`
-- 📝 Blog Post: [Link to published post]
-- 🔗 LinkedIn Post: [Link]
+Use any platform that supports Python web apps:
+
+- Render
+- Railway
+- Fly.io
+- VPS with Nginx + Gunicorn
+- Docker host
+
+Production checklist:
+
+- Set strong `SECRET_KEY`
+- Set strong `ADMIN_PASSWORD`
+- Use PostgreSQL for production
+- Set `PUBLIC_BASE_URL` to HTTPS domain
+- Enable Twilio signature validation if using Twilio
+- Configure HTTPS webhook URL
+- Back up database regularly
+- Confirm WhatsApp opt-in/compliance policy for customers
+- Do not use it as a general-purpose AI assistant; keep it business-support focused
+
+See `docs/DEPLOYMENT.md` for full instructions.
+
+---
+
+## What to submit for college/project review
+
+- GitHub repo with this code
+- Screenshots of browser demo
+- Screenshot of Twilio Sandbox webhook configuration
+- Screenshot of WhatsApp message handling
+- Screenshot of admin dashboard
+- Architecture diagram from `docs/ARCHITECTURE.md`
+- Test output screenshot from `pytest -q`
+- Dataset references from `docs/DATASETS.md`
+- Case study from `docs/CASE_STUDY_TEMPLATE.md`
+
+---
+
+## License
+
+MIT License. You can use and customize this for student, portfolio, and client demo projects.
